@@ -7,7 +7,12 @@ Vagrant.configure("2") do |config|
 
   # forget about the insecure key (small speedup)
   config.ssh.insert_key = false
-
-  # disable default shared folder (small speedup)
-  config.vm.synced_folder '.', '/vagrant', disabled: true
+  
+  config.vm.provision "shell", inline: <<SCRIPT
+	cp -r /vagrant/pip-cache /root/.cache/
+	rm -rf /root/.cache/pip
+	mv /root/.cache/pip-cache /root/.cache/pip
+	chown -R root:root /root/.cache/pip
+	echo "Defaults	always_set_home" >> /etc/sudoers.d/home
+SCRIPT
 end
